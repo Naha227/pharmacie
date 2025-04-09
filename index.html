@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Recherche de Médicaments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5fa;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #5c4d7d;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      background: #6c5ce7;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .results {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .medicament {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 5px solid #6c5ce7;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Recherche de Médicaments</h1>
+
+<form id="searchForm">
+  <label for="nom">Nom du médicament :</label>
+  <input type="text" id="nom">
+
+  <label for="categorie">Catégorie :</label>
+  <select id="categorie">
+    <option value="">-- Choisir --</option>
+    <option>Analgesique</option>
+    <option>Antibiotique</option>
+    <option>Allergie</option>
+    <option>Diabète</option>
+  </select>
+
+  <label for="dosage">Dosage :</label>
+  <input type="text" id="dosage" placeholder="ex: 500mg">
+
+  <label for="forme">Forme :</label>
+  <select id="forme">
+    <option value="">-- Choisir --</option>
+    <option>Comprimé</option>
+    <option>Sirop</option>
+    <option>Crème</option>
+  </select>
+
+  <label for="ordonnance">
+    <input type="checkbox" id="ordonnance"> Nécessite une ordonnance
+  </label>
+
+  <label for="prixMax">Prix maximum :</label>
+  <input type="number" id="prixMax" placeholder="ex: 100">
+
+  <button type="submit">Rechercher</button>
+</form>
+
+<div class="results" id="resultats"></div>
+
+<script>
+  const medicaments = [
+    { nom: "Paracétamol", categorie: "Analgesique", dosage: "500mg", forme: "Comprimé", ordonnance: false, prix: 20 },
+    { nom: "Amoxicilline", categorie: "Antibiotique", dosage: "250mg", forme: "Sirop", ordonnance: true, prix: 60 },
+    { nom: "Loratadine", categorie: "Allergie", dosage: "10mg", forme: "Comprimé", ordonnance: false, prix: 35 },
+    { nom: "Insuline", categorie: "Diabète", dosage: "100UI", forme: "Injectable", ordonnance: true, prix: 150 },
+  ];
+
+  const form = document.getElementById("searchForm");
+  const resultats = document.getElementById("resultats");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const nom = document.getElementById("nom").value.toLowerCase();
+    const categorie = document.getElementById("categorie").value;
+    const dosage = document.getElementById("dosage").value.toLowerCase();
+    const forme = document.getElementById("forme").value;
+    const ordonnance = document.getElementById("ordonnance").checked;
+    const prixMax = parseFloat(document.getElementById("prixMax").value);
+
+    const filtres = medicaments.filter(med => {
+      return (
+        (nom === "" || med.nom.toLowerCase().includes(nom)) &&
+        (categorie === "" || med.categorie === categorie) &&
+        (dosage === "" || med.dosage.toLowerCase().includes(dosage)) &&
+        (forme === "" || med.forme === forme) &&
+        (!ordonnance || med.ordonnance === ordonnance) &&
+        (isNaN(prixMax) || med.prix <= prixMax)
+      );
+    });
+
+    afficherResultats(filtres);
+  });
+
+  function afficherResultats(meds) {
+    resultats.innerHTML = "";
+    if (meds.length === 0) {
+      resultats.innerHTML = "<p>Aucun médicament ne correspond à votre recherche.</p>";
+      return;
+    }
+
+    meds.forEach(med => {
+      const div = document.createElement("div");
+      div.classList.add("medicament");
+      div.innerHTML = `
+        <strong>${med.nom}</strong><br>
+        Catégorie : ${med.categorie}<br>
+        Dosage : ${med.dosage}<br>
+        Forme : ${med.forme}<br>
+        Prix : ${med.prix} Dhs<br>
+        ${med.ordonnance ? "<em>Nécessite une ordonnance</em>" : "Sans ordonnance"}
+      `;
+      resultats.appendChild(div);
+    });
+  }
+</script>
+
+</body>
+</html>
